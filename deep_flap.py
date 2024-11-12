@@ -47,7 +47,7 @@ tempo_tubarao_tela = 3000
 bg = pygame.image.load('img/bg.png')
 ground_img = pygame.image.load('img/ground.png')
 button_img = pygame.image.load('img/restart.png')
-shark_img = pygame.image.load('C:/Users/renan/OneDrive/Área de Trabalho/Deep Flap/img/tubarao.png').convert_alpha()
+shark_img = pygame.image.load('img/tubarao.png').convert_alpha()
 
 # Variáveis para controlar a exibição e movimento do tubarão
 shark_visible = False
@@ -290,9 +290,9 @@ while run:
     # Atualiza o texto do score na tela
     draw_text(str(score), font, white, original_width // 2, 20)
 
-    # # Look for collision
-    # if pygame.sprite.groupcollide(bird_group, pipe_group, False, False) or flappy.rect.top < 0:
-    #     game_over = True
+    # Look for collision
+    if pygame.sprite.groupcollide(bird_group, pipe_group, False, False) or flappy.rect.top < 0:
+        game_over = True
     # Once the bird has hit the ground it's game over and no longer flying
     if flappy.rect.bottom >= 768:
         game_over = True
@@ -357,4 +357,3 @@ while run:
     pygame.display.update()
 
 pygame.quit()
-

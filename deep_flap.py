@@ -270,8 +270,7 @@ while run:
     # Desenho do solo
     virtual_screen.blit(ground_img, (ground_scroll, original_height - 168))
 
-    # Atualização da pontuação Aqui
-    # Aqui ta com um bug, toda primeira vez que o jogo é iniciado, a pontuação fica travada. Ele só reseta dps que morre
+    # Atualização da pontuação, dps olhamos aqui
     if len(pipe_group) > 0:
         bird = bird_group.sprites()[0]
         pipe = pipe_group.sprites()[0]

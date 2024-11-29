@@ -20,7 +20,7 @@ screen_height = 624  # Altura desejada
 # Cria uma superfície de tamanho original
 virtual_screen = pygame.Surface((original_width, original_height))
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Flappy Bird')
+pygame.display.set_caption('Deep Flappy')
 
 # Define font
 font = pygame.font.SysFont('Bauhaus 93', 60)
@@ -32,7 +32,7 @@ white = (255, 255, 255)
 difficulty = 1
 ground_scroll = 0
 scroll_speed = 4 * difficulty
-flying = False
+swimming = False
 game_over = False
 pipe_gap = 180
 pipe_frequency = 1500 / difficulty  
@@ -136,9 +136,9 @@ def move_shark():
 
     return shark_visible, shark_x, shark_y
 
-class Bird(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
+class Fish(pygame.sprite.Sprite):
+    def __init__(self, x, y):  # Corrigido o nome do método para __init__
+        pygame.sprite.Sprite.__init__(self)  # Corrigido para chamar o inicializador da classe Sprite
         self.images = []
         self.index = 0
         self.counter = 0
@@ -152,7 +152,7 @@ class Bird(pygame.sprite.Sprite):
         self.clicked = False
 
     def update(self):
-        if flying:
+        if swimming:
             self.vel += 0.5
             if self.vel > 8:
                 self.vel = 8
@@ -176,21 +176,21 @@ class Bird(pygame.sprite.Sprite):
         else:
             self.image = pygame.transform.rotate(self.images[self.index], -90)
 
+
 class Pipe(pygame.sprite.Sprite):
     def __init__(self, x, y, position):
-        pygame.sprite.Sprite.__init__(self)
+        pygame.sprite.Sprite.__init__(self)  # Initialize the Sprite class
         self.image = pygame.image.load("img/pipe.png")
         self.rect = self.image.get_rect()
-        self.initial_y = y  # Guarda a posição inicial central para oscilar
-
-        # Define a posição inicial baseada na posição do cano (superior ou inferior)
-        if position == 1:
+        self.initial_y = y  # Store the initial y position for oscillation
+        
+        if position == 1:  # Top pipe
             self.image = pygame.transform.flip(self.image, False, True)
             self.rect.bottomleft = [x, y - int(pipe_gap / 2) - 20]
-        elif position == -1:
+        elif position == -1:  # Bottom pipe
             self.rect.topleft = [x, y + int(pipe_gap / 2)]
-        
-        self.position = position  # Guarda a posição do cano (1 para superior e -1 para inferior)
+
+        self.position = position  # Store the position of the pipe (1 for top, -1 for bottom)
 
     def update(self):
         # Movimento horizontal
@@ -212,7 +212,7 @@ class Pipe(pygame.sprite.Sprite):
             self.kill()
 
 class Button():
-    def __init__(self, x, y, image):
+    def __init__(self, x, y, image):  # Correct constructor name
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
@@ -228,8 +228,8 @@ class Button():
         return action
 
 class Shark(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
+    def _init_(self):
+        pygame.sprite.Sprite._init_(self)
         self.image = shark_img
         self.rect = self.image.get_rect()
         # Random vertical position
@@ -243,11 +243,11 @@ class Shark(pygame.sprite.Sprite):
             self.kill()  # Remove after 3 seconds
 
 pipe_group = pygame.sprite.Group()
-bird_group = pygame.sprite.Group()
+fish_group = pygame.sprite.Group()
 shark_group = pygame.sprite.Group()
 
-flappy = Bird(350, 400)
-bird_group.add(flappy)
+flappy = Fish(350, 400)
+fish_group.add(flappy)  # Adiciona a instância 'flappy' ao grupo
 button = Button(original_width // 2 - 50, original_height // 2 - 100, button_img)
 
 # Loop principal
@@ -264,24 +264,24 @@ while run:
 
     # Desenho e atualização dos elementos principais
     pipe_group.draw(virtual_screen)
-    bird_group.draw(virtual_screen)
-    bird_group.update()
+    fish_group.draw(virtual_screen)
+    fish_group.update()
 
     # Desenho do solo
     virtual_screen.blit(ground_img, (ground_scroll, original_height - 168))
 
     # Atualização da pontuação, dps olhamos aqui
     if len(pipe_group) > 0:
-        bird = bird_group.sprites()[0]
+        fish = fish_group.sprites()[0]
         pipe = pipe_group.sprites()[0]
 
         # Checa se o pássaro está dentro do cano e ainda não passou por ele
-        if bird.rect.left > pipe.rect.left and bird.rect.right < pipe.rect.right and not pass_pipe:
+        if fish.rect.left > pipe.rect.left and fish.rect.right < pipe.rect.right and not pass_pipe:
             pass_pipe = True
             print("Pássaro entrou no cano. Aguardando saída para contar score.")
 
         # Incrementa o score ao passar pelo cano
-        if pass_pipe and bird.rect.left > pipe.rect.right:
+        if pass_pipe and fish.rect.left > pipe.rect.right:
             score += 1
             pass_pipe = False  # Reseta para o próximo cano
             print(f"Score incrementado: {score}")
@@ -290,15 +290,15 @@ while run:
     draw_text(str(score), font, white, original_width // 2, 20)
 
     # Look for collision
-    if pygame.sprite.groupcollide(bird_group, pipe_group, False, False) or flappy.rect.top < 0:
+    if pygame.sprite.groupcollide(fish_group, pipe_group, False, False) or flappy.rect.top < 0:
         game_over = True
-    # Once the bird has hit the ground it's game over and no longer flying
+    # Once the fish has hit the ground it's game over and no longer swimming
     if flappy.rect.bottom >= 768:
         game_over = True
-        flying = False
+        swimming = False
 
     # Controle do estado do jogo e movimento dos canos
-    if flying and not game_over:
+    if swimming and not game_over:
         time_now = pygame.time.get_ticks()
         if time_now - last_pipe > pipe_frequency:
             pipe_height = random.randint(-screen_height // 3, screen_height // 3)
@@ -347,8 +347,8 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-        if event.type == pygame.MOUSEBUTTONDOWN and not flying and not game_over:
-            flying = True
+        if event.type == pygame.MOUSEBUTTONDOWN and not swimming and not game_over:
+            swimming = True
 
     # Escala a tela e atualiza a exibição
     scaled_surface = pygame.transform.scale(virtual_screen, (screen_width, screen_height))

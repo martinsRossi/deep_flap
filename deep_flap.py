@@ -39,8 +39,8 @@ pipe_frequency = 1500 / difficulty
 last_pipe = pygame.time.get_ticks() - pipe_frequency
 score = 0
 pass_pipe = False
-tempo_inicial = 30000
-tempo_final = 45000
+tempo_inicial = 5000
+tempo_final = 10000
 tempo_tubarao_tela = 3000
 
 # Carrega imagens (mantendo os tamanhos originais)

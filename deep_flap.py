@@ -39,8 +39,8 @@ pipe_frequency = 1500 / difficulty
 last_pipe = pygame.time.get_ticks() - pipe_frequency
 score = 0
 pass_pipe = False
-tempo_inicial = 5000
-tempo_final = 10000
+tempo_inicial = 10000
+tempo_final = 20000
 tempo_tubarao_tela = 3000
 
 # Carrega imagens (mantendo os tamanhos originais)
@@ -159,10 +159,10 @@ class Fish(pygame.sprite.Sprite):
             if self.rect.bottom < original_height - 168:
                 self.rect.y += int(self.vel)
         if not game_over:
-            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
+            if (pygame.mouse.get_pressed()[0] == 1 or pygame.key.get_pressed()[pygame.K_SPACE]) and not self.clicked:
                 self.clicked = True
                 self.vel = -10
-            if pygame.mouse.get_pressed()[0] == 0:
+            if pygame.mouse.get_pressed()[0] == 0 and not pygame.key.get_pressed()[pygame.K_SPACE]:
                 self.clicked = False
             flap_cooldown = 5
             self.counter += 1
@@ -260,7 +260,7 @@ while run:
 
     # Atualize a rolagem e frequência dos canos conforme a dificuldade
     scroll_speed = 4 * difficulty  # Aumenta a velocidade da rolagem com a dificuldade
-    pipe_frequency = 1500 / difficulty  # Aumenta a frequência dos canos com a dificuldade
+    pipe_frequency = 2000 / difficulty  # Aumenta a frequência dos canos com a dificuldade
 
     # Desenho e atualização dos elementos principais
     pipe_group.draw(virtual_screen)
@@ -347,7 +347,8 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-        if event.type == pygame.MOUSEBUTTONDOWN and not swimming and not game_over:
+        if (event.type == pygame.MOUSEBUTTONDOWN or 
+        (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE)) and not swimming and not game_over:
             swimming = True
 
     # Escala a tela e atualiza a exibição
